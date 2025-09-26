@@ -1,16 +1,20 @@
+
 # Nexus Repository Manager — Installation (Native, Docker & Docker Compose)
 
-This repository provides step-by-step instructions for installing Sonatype Nexus Repository Manager 3 in three ways:
+This repository provides step-by-step instructions for installing **Sonatype Nexus Repository Manager 3** in three ways:
 
 1. Native installation (Linux + systemd)  
-2. Docker (single container with `docker run`)  
+2. Docker (single container)  
 3. Docker Compose (recommended)
 
-Default Web UI: http://<server-ip>:8081 (or http://<server-ip> if mapped to port 80)  
+Default Web UI:  
+- http://<server-ip>:8081 (default)  
+- http://<server-ip> (if mapped to port 80)  
+ repo and here’s a clean, ful 
+- Native:I checked your repo and here’s a clean, full 
+- Docker/Compose:d your repo and here’s a clean 
 
-Initial admin password is located in:
-- Native: /opt/sonatype-work/nexus3/admin.password  
-- Docker/Compose: /nexus-data/admin.password
+---
 
 ## A) Native Installation (Linux + systemd)
 
@@ -77,7 +81,7 @@ sudo cat /opt/sonatype-work/nexus3/admin.password
 
 ⸻
 
-## B) Docker Installation (single container)
+B) Docker Installation (single container)
 
 1. Install Docker
 
@@ -107,9 +111,9 @@ docker logs -f nexus
 
 ⸻
 
-## C) Docker Compose Installation (recommended)
+C) Docker Compose Installation (recommended)
 
-1. Install Docker and Compose
+1. Install Docker & Compose
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io docker-compose-plugin
@@ -142,16 +146,16 @@ docker compose up -d
 docker exec -it nexus cat /nexus-data/admin.password
 
 5. Access UI
- • If you mapped 80:8081: http://<server-ip>
- • If you mapped 8081:8081: http://<server-ip>:8081
+ • If using 80:8081: http://<server-ip>
+ • If using 8081:8081: http://<server-ip>:8081
 
 ⸻
 
-# Troubleshooting
+Troubleshooting
 
 Container keeps restarting
 
-If you see Restarting in docker ps:
+If docker ps shows the Nexus container as Restarting:
  1. Check logs:
 
 docker compose logs -f nexus
@@ -169,19 +173,17 @@ docker compose down
 docker compose up -d
 
 
- 4. Check again:
+ 4. Verify startup:
 
 docker compose logs -f nexus
 
-Wait for:
+Look for:
 
 Started Sonatype Nexus OSS ...
 
-
-
 ⸻
 
-# License
+License
 
 MIT License © 2025 SobhanTaghidoust
 
