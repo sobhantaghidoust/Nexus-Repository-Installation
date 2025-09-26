@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    restart: always
+    ports:
+      - "80:8081"   # Host port 80 -> container 8081 (UI available at http://server-ip)
+    volumes:
+      - /home/nexus-data:/nexus-data
