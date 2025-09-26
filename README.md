@@ -81,9 +81,9 @@ sudo cat /opt/sonatype-work/nexus3/admin.password
 ---
 ⸻
 
-#### B) Docker Installation (single container)
+## B) Docker Installation (single container)
 
-1. Install Docker
+### 1. Install Docker
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io
@@ -109,9 +109,9 @@ docker exec -it nexus cat /opt/sonatype-work/nexus3/admin.password
 docker logs -f nexus
 
 ---  
-##### C) Docker Compose Installation (recommended)
+## C) Docker Compose Installation (recommended)
 
-1. Install Docker & Compose
+### 1. Install Docker & Compose
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io docker-compose-plugin
@@ -149,7 +149,7 @@ docker exec -it nexus cat /nexus-data/admin.password
 
 ---
 
-###### Troubleshooting
+## Troubleshooting
 
 Container keeps restarting
 
