@@ -78,11 +78,12 @@ sudo systemctl status nexus
 
 sudo cat /opt/sonatype-work/nexus3/admin.password
 
+---
 ```
 ## B) Docker Installation (single container)
 
 ### 1. Install Docker
----
+```
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
@@ -105,12 +106,13 @@ docker exec -it nexus cat /opt/sonatype-work/nexus3/admin.password
 5. Logs
 
 docker logs -f nexus
-
-  
+---
+```  
 ## C) Docker Compose Installation (recommended)
 
 ### 1. Install Docker & Compose
-
+```
+---
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io docker-compose-plugin
 sudo systemctl enable --now docker
@@ -145,8 +147,7 @@ docker exec -it nexus cat /nexus-data/admin.password
  • If using 80:8081: http://<server-ip>
  • If using 8081:8081: http://<server-ip>:8081
 
----
-
+```
 ## Troubleshooting
 ```
 Container keeps restarting
@@ -178,7 +179,6 @@ Look for:
 Started Sonatype Nexus OSS ...
 
 ---
-
 License
 
 MIT License © 2025 SobhanTaghidoust
