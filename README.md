@@ -1,35 +1,30 @@
-README.md
+# Nexus Repository Manager — Installation (Native, Docker & Docker Compose)
 
-# Nexus Repository Manager — Installation (Native & Docker)
+This repository provides step-by-step instructions for installing Sonatype Nexus Repository Manager 3 in three ways:
 
-This repository provides step-by-step instructions for installing **Sonatype Nexus Repository Manager 3** in two ways:
+1. Native installation (Linux + systemd)  
+2. Docker (single container with `docker run`)  
+3. Docker Compose (recommended)
 
-Native && Docker
----
+Default Web UI: http://<server-ip>:8081 (or http://<server-ip> if mapped to port 80)  
 
-## Prerequisites
-
-- Native:
-  - Linux (Ubuntu)
-  - OpenJDK 17 
-  - sudo privileges
-
-- Docker:
-  - Docker
-  - Docker Compose 
----
+Initial admin password is located in:
+- Native: /opt/sonatype-work/nexus3/admin.password  
+- Docker/Compose: /nexus-data/admin.password
 
 ## A) Native Installation (Linux + systemd)
 
-### 1. Update packages and install Java
+### 1. Install prerequisites
 ```bash
 sudo apt update
-sudo apt install openjdk-17-jdk -y
+sudo apt install -y openjdk-17-jre curl tar wget
 java -version
 
-2. Create Nexus user
+2. Create user and directories
 
-sudo useradd -r -s /bin/false nexus
+sudo useradd --system --home /opt/nexus --shell /bin/false nexus
+sudo mkdir -p /opt/nexus /opt/sonatype-work/nexus3
+sudo chown -R nexus:nexus /opt/nexus /opt/sonatype-work
 
 3. Download and extract Nexus
 
@@ -37,18 +32,20 @@ cd /opt
 sudo wget https://download.sonatype.com/nexus/3/nexus-3.83.2-01-linux-x86_64.tar.gz
 sudo tar -xvzf nexus-3.83.2-01-linux-x86_64.tar.gz
 sudo mv nexus-3.83.2-01 nexus
-
-4. Set permissions
-
 sudo chown -R nexus:nexus /opt/nexus
-sudo chown -R nexus:nexus /opt/sonatype-work
 
-5. Create a systemd service
+4. Configure run user and JVM options
 
-sudo nano /etc/systemd/system/nexus.service
+echo 'run_as_user="nexus"' | sudo tee /opt/nexus/bin/nexus.rc
 
-Paste:
+echo 'INSTALL4J_ADD_VM_PARAMS="-Xms1200m -Xmx1200m -Dnexus-work=/opt/sonatype-work/nexus3 -Djava.io.tmpdir=/opt/sonatype-work/nexus3/tmp"' \
+| sudo tee /opt/nexus/bin/nexus.vmoptions
 
+sudo chown nexus:nexus /opt/nexus/bin/nexus.rc /opt/nexus/bin/nexus.vmoptions
+
+5. Create systemd service
+
+sudo tee /etc/systemd/system/nexus.service > /dev/null <<'EOF'
 [Unit]
 Description=Sonatype Nexus Repository Manager
 After=network.target
@@ -64,6 +61,7 @@ Restart=on-abort
 
 [Install]
 WantedBy=multi-user.target
+EOF
 
 6. Enable and start service
 
@@ -76,32 +74,23 @@ sudo systemctl status nexus
 
 sudo cat /opt/sonatype-work/nexus3/admin.password
 
-8. Access Web UI
-
-Open:
-http://<server-ip>:8081
-Default user: admin
 
 ⸻
 
-B) Docker Installation
+B) Docker Installation (single container)
 
 1. Install Docker
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
+sudo systemctl enable --now docker
 
 2. Run Nexus container
 
-docker run -d -p 80:8081 --name nexus \
+docker run -d --name nexus \
+  -p 80:8081 \
   -v nexus-data:/nexus-data \
-  sonatype/nexus3
-
- • -p 80:8081: maps container port 8081 → host port 80
- • -v nexus-data:/nexus-data: persists Nexus data
- • --name nexus: container name
+  sonatype/nexus3:latest
 
 3. Configure auto-restart
 
@@ -109,40 +98,24 @@ docker update --restart=always nexus
 
 4. Get admin password
 
-docker exec -it nexus bash
-cat /opt/sonatype-work/nexus3/admin.password
+docker exec -it nexus cat /opt/sonatype-work/nexus3/admin.password
 
-5. Access Web UI
+5. Logs
 
-Open:
-http://<server-ip> (if mapped to port 80)
-or
-http://<server-ip>:8081
+docker logs -f nexus
 
-⸻
-> سُب:
-Perfect — here’s a clean, exact step-by-step recipe you can copy-paste and follow. It assumes you want the Docker-Compose mode as the recommended (3rd) method. I include the exact docker/compose.yml, the commands to run, how to get the admin password, and a short troubleshooting section that covers the common problems (permission, wrong log mapping, port conflict). If anything in the logs looks wrong, follow the fixes shown — I already anticipated the errors you saw earlier and included the fixes.
 
 ⸻
 
-Recommended (mode 3) — Docker Compose (step-by-step)
+C) Docker Compose Installation (recommended)
 
-1) Install Docker (on Ubuntu)
+1. Install Docker and Compose
 
-sudo apt update
-sudo apt upgrade -y
-sudo apt install -y docker.io
-# ensure docker is running
-sudo systemctl enable docker
-# recommended: install the compose plugin (if you don't have 'docker compose' command)
-sudo apt install docker-compose
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y docker.io docker-compose-plugin
+sudo systemctl enable --now docker
 
-2) Create the compose file
-
-Create folder docker/ in your repo (or on the server) and add docker-compose.yml with this content:
-
-(vim/vi/nano)  docker-compose.yml
-paste this:
+2. Create docker/compose.yml
 
 version: "3.8"
 services:
@@ -151,147 +124,65 @@ services:
     container_name: nexus
     restart: always
     ports:
-      - "80:8081"   # change to "8081:8081" if you prefer to use host port 8081
+      - "80:8081"   # host port 80 → container port 8081
     volumes:
-      - /home/nexus-data:/nexus-data   # host path for Nexus data
+      - /home/nexus-data:/nexus-data
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
 
-Tip: If you prefer not to use port 80 (maybe blocked by another service), change the ports line to "8081:8081" and open http://<server-ip>:8081.
+3. Start Nexus
 
-3) Create the host data directory (quick safe step)
+cd docker
+docker compose up -d
 
-sudo mkdir -p /home/nexus-data
-# Quick permissive fix so container can write the first time:
-sudo chmod 0777 /home/nexus-data
+4. Get admin password
 
-(After you confirm Nexus works you can tighten permissions — instructions below.)
-
-4) Start Nexus with Compose
-
-From the folder that contains docker/compose.yml:
-
-docker-compose up -d
----
-
-## Troubleshooting
-
-### Nexus container keeps restarting
-If you see in docker ps that the Nexus container status is Restarting (or logs keep looping):
-
-1. Check logs
-   ```bash
-   docker compose logs -f nexus
-
-5) Get the initial admin password and open UI
-
-# inside container:
 docker exec -it nexus cat /nexus-data/admin.password
 
-# then open in browser:
-# if you used "80:8081" -> http://<server-ip>
-# if you used "8081:8081" -> http://<server-ip>:8081
-# login user: admin  password: (value from command above)
-
+5. Access UI
+ • If you mapped 80:8081: http://<server-ip>
+ • If you mapped 8081:8081: http://<server-ip>:8081
 
 ⸻
 
-Quick stop/start/status commands
+Troubleshooting
 
-# stop
-docker compose down
+Container keeps restarting
 
-# start again
-docker compose up -d
+If you see Restarting in docker ps:
+ 1. Check logs:
 
-# check container list
-docker ps
-
-# follow logs again
 docker compose logs -f nexus
 
 
-⸻
+ 2. Fix permissions on host volume:
 
-Troubleshooting (common problems + fixes)
+sudo mkdir -p /home/nexus-data
+sudo chmod -R 0777 /home/nexus-data
 
-A) Error in logs: No such file or directory for /opt/sonatype/.../nexus.log or similar
 
-Cause: you mapped a host folder to the wrong container path (for example /var/log/nexus) or created a conflicting mapping.
-Fix:
- • Use only /nexus-data mapping (recommended). Remove any mapping to /var/log/nexus.
- • Update docker/compose.yml to the version above, then:
+ 3. Recreate container:
 
 docker compose down
 docker compose up -d
 
-B) Permission denied / container cannot write to /nexus-data
 
-Quick (safe for testing):
+ 4. Check again:
 
-sudo chmod -R 0777 /home/nexus-data
-docker compose restart nexus
+docker compose logs -f nexus
 
-Safer (production): find the UID used by the Nexus process inside the image and chown the directory to that UID, e.g.:
+Wait for:
 
-# get the container UID (runs a temporary container and prints user id)
-docker run --rm --entrypoint id sonatype/nexus3
-# then chown the host folder to that UID (replace <uid>:<gid> with values printed)
-sudo chown -R <uid>:<gid> /home/nexus-data
-sudo chmod -R 0755 /home/nexus-data
-docker compose restart nexus
-
-C) Port conflict (can’t bind to port 80)
-
-Symptom: bind: address already in use or compose fails.
-Fix:
- • Change the compose ports mapping to "8081:8081" and use http://<server-ip>:8081 in browser.
- • Or stop the service that uses 80 (e.g., sudo systemctl stop nginx).
-
-D) docker compose command not found
-
-If docker compose is missing, use the legacy command:
-
-docker-compose up -d
-
-Or install the plugin as in step 1.
-
-E) Nexus starts but UI shows blank or login fails
-
-> سُب:
-• Check logs: docker compose logs -f nexus and look for exceptions.
- • If you see Started Sonatype Nexus but UI still not reachable, check firewall:
-
-sudo ufw status
-# allow port 80 or 8081
-sudo ufw allow 80/tcp
-sudo ufw allow 8081/tcp
+Started Sonatype Nexus OSS ...
 
 
-⸻
-
-Final notes (what I’d do if anything breaks)
- • If logs complain about missing log directory — I remove any incorrect log volume mapping and keep only /nexus-data.
- • If write errors — make sure /home/nexus-data exists and is writable (chmod 0777 quick fix), then find the correct UID and chown for a cleaner solution.
- • If port conflicts — switch to 8081 mapping.
-
-⸻
-
-If you want, I can:
- • produce the exact docker-compose.yml text ready to paste into GitHub (I already gave it above), or
- • give the single-line commands you can paste into the server to create the folder, create the file, and run compose (I can produce that exact shell snippet now).
-
-⸻
-
-Notes
- • After logging in the first time, you will be prompted to change the admin password.
- • You can create hosted or proxy repositories from the Repositories menu in the Nexus Web UI.
- • Nexus supports uploading .deb, .rpm, Maven, npm, and many other package types.
 
 ⸻
 
 License
 
 MIT License © 2025 SobhanTaghidoust
+
+---
