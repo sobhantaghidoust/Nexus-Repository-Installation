@@ -1,5 +1,24 @@
+# Nexus Repository Manager 
 
-# Nexus Repository Manager — Installation (Native, Docker & Docker Compose)
+This repository contains step-by-step instructions to set up Sonatype Nexus Repository Manager 3 as a local package repository.  
+
+Nexus Repository Manager is a powerful artifact management tool that allows you to:  
+- Host your own local repositories for packages (e.g., Maven, npm, Docker, PyPI, APT, YUM).  
+- Proxy and cache remote repositories for faster builds and offline availability.  
+- Centralize dependency management in your infrastructure.  
+
+The goal of this repo is to provide clean installation methods for running Nexus on your own environment:  
+- A) Native installation on Linux using systemd.  
+- B) Docker single container.  
+- C) Docker Compose (recommended for production-like environments).  
+
+This is especially useful if you want to:  
+- Set up a private repository for your team or organization.  
+- Speed up builds by caching external packages locally.  
+- Have control and reliability over your software dependencies.  
+
+---
+# Installation (Native, Docker & Docker Compose)
 
 This repository provides step-by-step instructions for installing **Sonatype Nexus Repository Manager 3** in three ways:
 
