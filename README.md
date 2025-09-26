@@ -19,11 +19,11 @@ Default Web UI:
 ## A) Native Installation (Linux + systemd)
 
 ### 1. Install prerequisites
-bash
+```bash
 sudo apt update
-sudo apt install -y openjdk-17-jre curl tar wget
+sudo apt install -y openjdk-17-jre 
 java -version
-```
+
 2. Create user and directories
 
 sudo useradd --system --home /opt/nexus --shell /bin/false nexus
@@ -38,16 +38,7 @@ sudo tar -xvzf nexus-3.83.2-01-linux-x86_64.tar.gz
 sudo mv nexus-3.83.2-01 nexus
 sudo chown -R nexus:nexus /opt/nexus
 
-4. Configure run user and JVM options
-
-echo 'run_as_user="nexus"' | sudo tee /opt/nexus/bin/nexus.rc
-
-echo 'INSTALL4J_ADD_VM_PARAMS="-Xms1200m -Xmx1200m -Dnexus-work=/opt/sonatype-work/nexus3 -Djava.io.tmpdir=/opt/sonatype-work/nexus3/tmp"' \
-| sudo tee /opt/nexus/bin/nexus.vmoptions
-
-sudo chown nexus:nexus /opt/nexus/bin/nexus.rc /opt/nexus/bin/nexus.vmoptions
-
-5. Create systemd service
+4. Create systemd service
 
 sudo tee /etc/systemd/system/nexus.service > /dev/null <<'EOF'
 [Unit]
@@ -67,14 +58,14 @@ Restart=on-abort
 WantedBy=multi-user.target
 EOF
 
-6. Enable and start service
+5. Enable and start service
 
 sudo systemctl daemon-reload
 sudo systemctl enable nexus
 sudo systemctl start nexus
 sudo systemctl status nexus
 
-7. Get admin password
+6. Get admin password
 
 sudo cat /opt/sonatype-work/nexus3/admin.password
 
@@ -178,9 +169,9 @@ Look for:
 
 Started Sonatype Nexus OSS ...
 
----
-License
 
+```
 MIT License © 2025 SobhanTaghidoust
+---
 
 ---
