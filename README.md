@@ -19,11 +19,11 @@ Default Web UI:
 ## A) Native Installation (Linux + systemd)
 
 ### 1. Install prerequisites
-```bash
+bash
 sudo apt update
 sudo apt install -y openjdk-17-jre curl tar wget
 java -version
-
+```
 2. Create user and directories
 
 sudo useradd --system --home /opt/nexus --shell /bin/false nexus
