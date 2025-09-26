@@ -77,7 +77,7 @@ sudo cat /opt/sonatype-work/nexus3/admin.password
 
 ⸻
 
-B) Docker Installation (single container)
+## B) Docker Installation (single container)
 
 1. Install Docker
 
@@ -107,7 +107,7 @@ docker logs -f nexus
 
 ⸻
 
-C) Docker Compose Installation (recommended)
+## C) Docker Compose Installation (recommended)
 
 1. Install Docker and Compose
 
@@ -147,7 +147,7 @@ docker exec -it nexus cat /nexus-data/admin.password
 
 ⸻
 
-Troubleshooting
+# Troubleshooting
 
 Container keeps restarting
 
@@ -181,7 +181,7 @@ Started Sonatype Nexus OSS ...
 
 ⸻
 
-License
+# License
 
 MIT License © 2025 SobhanTaghidoust
 
