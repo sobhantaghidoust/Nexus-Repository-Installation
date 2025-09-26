@@ -9,11 +9,7 @@ This repository provides step-by-step instructions for installing **Sonatype Nex
 
 Default Web UI:  
 - http://<server-ip>:8081 (default)  
-- http://<server-ip> (if mapped to port 80)  
- repo and here’s a clean, ful 
-- Native:I checked your repo and here’s a clean, full 
-- Docker/Compose:d your repo and here’s a clean 
-
+- http://<server-ip> (if mapped to any other port)  
 ---
 
 ## A) Native Installation (Linux + systemd)
@@ -120,10 +116,6 @@ services:
       - "80:8081"   # host port 80 → container port 8081
     volumes:
       - /home/nexus-data:/nexus-data
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
 
 3. Start Nexus
 
