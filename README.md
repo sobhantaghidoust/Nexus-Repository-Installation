@@ -79,12 +79,11 @@ sudo systemctl status nexus
 sudo cat /opt/sonatype-work/nexus3/admin.password
 
 ---
-⸻
 
 ## B) Docker Installation (single container)
 
 ### 1. Install Docker
-
+```
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
@@ -112,7 +111,7 @@ docker logs -f nexus
 ## C) Docker Compose Installation (recommended)
 
 ### 1. Install Docker & Compose
-
+```
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y docker.io docker-compose-plugin
 sudo systemctl enable --now docker
@@ -150,7 +149,7 @@ docker exec -it nexus cat /nexus-data/admin.password
 ---
 
 ## Troubleshooting
-
+```
 Container keeps restarting
 
 If docker ps shows the Nexus container as Restarting:
